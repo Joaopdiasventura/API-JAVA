@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.example.agenda.Pessoa.model.Pessoa;
+import com.example.agenda.Pessoa.entity.Pessoa;
 
 public class CadastrarPessoaDto {
 
