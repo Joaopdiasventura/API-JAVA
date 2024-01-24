@@ -3,6 +3,8 @@ package com.example.agenda.Pessoa;
 import com.example.agenda.Pessoa.Exception.PessoaNotFoundException;
 import com.example.agenda.Pessoa.Service.PessoaService;
 import com.example.agenda.Pessoa.dto.CadastrarPessoaDto;
+import com.example.agenda.Pessoa.model.Pessoa;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,28 +24,29 @@ public class PessoaController {
     @PostMapping("/hello")
     @ResponseStatus(value = HttpStatus.CREATED)
     public void Cadastrar(@RequestBody @Valid CadastrarPessoaDto cadastrarPessoaDto) {
-        pessoaService.Cadastrar(cadastrarPessoaDto);
+        pessoaService.Cadastrar(cadastrarPessoaDto.toPessoa());
     }
 
     @GetMapping("/hello")
     public ResponseEntity<List<CadastrarPessoaDto>> Ver() {
-        Map<UUID, CadastrarPessoaDto> pessoasCadastradas = pessoaService.receberTudo();
-        return ResponseEntity.ok(new ArrayList<>(pessoasCadastradas.values()));
+        Map<UUID, Pessoa> pessoasCadastradas = pessoaService.receberTudo();
+        List<CadastrarPessoaDto> pessoas = pessoasCadastradas.values().stream().map(p -> CadastrarPessoaDto.fromPessoa(p)).toList();
+        return ResponseEntity.ok(pessoas);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CadastrarPessoaDto> VerUnico(@PathVariable("id") UUID id) {
 
-        CadastrarPessoaDto cadastrarPessoaDto = pessoaService.pegaUnico(id);
-        return ResponseEntity.ok(cadastrarPessoaDto);
+        Pessoa pessoa = pessoaService.pegaUnico(id);
+        return ResponseEntity.ok(CadastrarPessoaDto.fromPessoa(pessoa));
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CadastrarPessoaDto> Atualizar(@PathVariable("id") UUID id, @RequestBody @Valid CadastrarPessoaDto atualizarPessoaDto) {
+    public ResponseEntity<CadastrarPessoaDto> Atualizar(@PathVariable("id") UUID id, @RequestBody @Valid Pessoa pessoa) {
         
-        pessoaService.Atualizar(id, atualizarPessoaDto);
-        return ResponseEntity.ok(pessoaService.pegaUnico(id));
+        pessoaService.Atualizar(id, pessoa);
+        return ResponseEntity.ok(CadastrarPessoaDto.fromPessoa(pessoaService.pegaUnico(id)));
         
     }
 
